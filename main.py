@@ -1,31 +1,59 @@
 import argparse
+import json
 from pathlib import Path
+from datetime import datetime
 
-def create_id():
+def fetch_data() -> list:
     try:
         with open("data.json", "r") as file:
-            data = json.load(file)
+            return json.load(file)
+
+def add_task(desc: str):
+    data = fetch_data()
+
+    new_task = {"id" : len(data), "desc" : desc, "status" : "todo", "createdAt" : datetime.now(), "updatedAt" : None}
+    data.append(new_task)
+
+    print(f"New task {desc} officially created at {new_task["createdAt"]}")
+    
+    try:
+        with open("data.json", "w") as file:
+            json.dump(data, file, indent=4)
 
 
-class Task:
-    def __init__(desc: str):
-        self.id = 
-        self.desc = desc
+def update_task(task_id:int, new_desc=None, new_status=None):
+    data = fetch_data()
 
+    while task_id != data[task_id]["id"]:
+        if task_id < data[task_id]["id"]:
+            task_id += 1
+        else:
+            task_id -= 1
+    
+    data[task_id]["updatedAt"] = datetime.now()
 
+    if new_desc:
+        data[task_id]["desc"] = new_desc
+    if new_status:
+        data[task_id]["status"] = new_status
 
-def add_task(id, desc, status, createdAt, updatedAt):
-    # TODO add a new task to the list
-    # create task object? or just append all to JSON file.
+def delete_task(task_id: int):
 
-def update_task(task_id):
-    # TODO update existing task
+    data = fetch_data()
 
-def delete_task(task_id):
-    # TODO delete existing task
-    # TODO optional: remove task id, either shift all IDs down, or allow new task to use the now released ID
+    while task_id != data[task_id]["id"]:
+        if task_id < data[task_id]["id"]:
+            task_id += 1
+        else:
+            task_id -= 1
 
+    data.remove(task_id)
 
+    i = 0
+    while i < len(data):
+        if i != data[i]["id"]:
+            data[i]["id"] = i
+        i += 1
 
 def list_tasks():
     # TODO list all tasks
